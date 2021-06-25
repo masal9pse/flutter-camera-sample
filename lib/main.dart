@@ -143,31 +143,61 @@ class CameraHomeState extends State<CameraHome> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.camera_alt),
-        // ボタンが押下された際の処理
-        onPressed: () async {
-          try {
-            // 画像を保存するパスを作成する
-            final path = join(
-              (await getApplicationDocumentsDirectory()).path,
-              '${DateTime.now()}.png',
-            );
+      floatingActionButton: Column(
+        verticalDirection: VerticalDirection.up, // childrenの先頭が下に配置されます。
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            child: const Icon(Icons.camera_alt),
+            // ボタンが押下された際の処理
+            onPressed: () async {
+              try {
+                // 画像を保存するパスを作成する
+                final path = join(
+                  (await getApplicationDocumentsDirectory()).path,
+                  '${DateTime.now()}.png',
+                );
 
-            // カメラで画像を撮影する
-            await _cameraController.takePicture(path);
+                // カメラで画像を撮影する
+                await _cameraController.takePicture(path);
 
-            // 画像を表示する画面に遷移
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CameraDisplay(imgPath: path),
-              ),
-            );
-          } catch (e) {
-            print(e);
-          }
-        },
+                // 画像を表示する画面に遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CameraDisplay(imgPath: path),
+                  ),
+                );
+              } catch (e) {
+                print(e);
+              }
+            },
+          ),
+          Container( // 余白を設けるためContainerでラップします。
+            margin: EdgeInsets.only(bottom: 16.0),
+            child: FloatingActionButton(
+              // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
+              heroTag: "scan",
+              child: Icon(Icons.title),
+              backgroundColor: Colors.pink[200],
+              onPressed: () async {
+                // （省略）タップされた際の処理
+              },
+            ),
+          ),
+          Container( // 余白を設けるためContainerでラップします。
+            margin: EdgeInsets.only(bottom: 16.0),
+            child: FloatingActionButton(
+              // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
+              heroTag: "scan",
+              child: Icon(Icons.title),
+              backgroundColor: Colors.blue[200],
+              onPressed: () async {
+                // （省略）タップされた際の処理
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -191,7 +221,7 @@ class CameraDisplay extends StatelessWidget {
           // children: [Expanded(child: Image.file(File(imgPath))),
           // Text('aaaaaa')
           // ],
-          children: [Image.file(File(imgPath))],
+          children: [Expanded(child: Image.file(File(imgPath)))],
         ));
   }
 }
