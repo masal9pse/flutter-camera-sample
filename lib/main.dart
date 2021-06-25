@@ -1,10 +1,12 @@
 // @dart=2.9
 import 'dart:async';
 import 'dart:io';
-import 'package:camera/camera.dart';
+// import 'package:camera/camera.dart';
+import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   // runAppが実行される前に、cameraプラグインを初期化
@@ -49,7 +51,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Camera Example'),
+        title: const Text('Camera Examplevvvv'),
       ),
       body: Wrap(
         children: [
@@ -88,6 +90,10 @@ class CameraHomeState extends State<CameraHome> {
   void initState() {
     super.initState();
 
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     // コントローラを初期化
     _cameraController = CameraController(
         // 使用するカメラをコントローラに設定
@@ -107,6 +113,13 @@ class CameraHomeState extends State<CameraHome> {
   @override
   void dispose() {
     // ウィジェットが破棄されたタイミングで、カメラのコントローラを破棄する
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     _cameraController.dispose();
     super.dispose();
   }
@@ -130,41 +143,31 @@ class CameraHomeState extends State<CameraHome> {
           }
         },
       ),
-      floatingActionButton: Row(
-        children: [
-          FloatingActionButton(
-            child: const Icon(Icons.camera_alt),
-            // ボタンが押下された際の処理
-            onPressed: () async {
-              try {
-                // 画像を保存するパスを作成する
-                final path = join(
-                  (await getApplicationDocumentsDirectory()).path,
-                  '${DateTime.now()}.png',
-                );
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.camera_alt),
+        // ボタンが押下された際の処理
+        onPressed: () async {
+          try {
+            // 画像を保存するパスを作成する
+            final path = join(
+              (await getApplicationDocumentsDirectory()).path,
+              '${DateTime.now()}.png',
+            );
 
-                // カメラで画像を撮影する
-                await _cameraController.takePicture(path);
+            // カメラで画像を撮影する
+            await _cameraController.takePicture(path);
 
-                // 画像を表示する画面に遷移
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CameraDisplay(imgPath: path),
-                  ),
-                );
-              } catch (e) {
-                print(e);
-              }
-            },
-          ),
-          FloatingActionButton(
-            backgroundColor: Colors.redAccent,
-            onPressed: () {
-              print("pressed");
-            },
-          ),
-        ],
+            // 画像を表示する画面に遷移
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CameraDisplay(imgPath: path),
+              ),
+            );
+          } catch (e) {
+            print(e);
+          }
+        },
       ),
     );
   }
@@ -185,7 +188,10 @@ class CameraDisplay extends StatelessWidget {
         ),
         body: Column(
           // Imageウィジェットで画像を表示する
-          children: [Expanded(child: Image.file(File(imgPath)))],
+          // children: [Expanded(child: Image.file(File(imgPath))),
+          // Text('aaaaaa')
+          // ],
+          children: [Image.file(File(imgPath))],
         ));
   }
 }
