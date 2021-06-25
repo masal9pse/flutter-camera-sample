@@ -21,7 +21,9 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   final CameraDescription camera;
+
   const MyApp({Key key, @required this.camera}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,9 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   final CameraDescription camera;
+
   const MyHomePage({Key key, @required this.camera}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +57,9 @@ class MyHomePage extends StatelessWidget {
               child: const Text('Camera'),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return CameraHome(camera: camera,);
+                  return CameraHome(
+                    camera: camera,
+                  );
                 }));
               }),
         ],
@@ -74,6 +80,7 @@ class CameraHome extends StatefulWidget {
 class CameraHomeState extends State<CameraHome> {
   // デバイスのカメラを制御するコントローラ
   CameraController _cameraController;
+
   // コントローラーに設定されたカメラを初期化する関数
   Future<void> _initializeCameraController;
 
@@ -83,7 +90,7 @@ class CameraHomeState extends State<CameraHome> {
 
     // コントローラを初期化
     _cameraController = CameraController(
-      // 使用するカメラをコントローラに設定
+        // 使用するカメラをコントローラに設定
         widget.camera,
         // 使用する解像度を設定
         // low : 352x288 on iOS, 240p (320x240) on Android
@@ -108,7 +115,7 @@ class CameraHomeState extends State<CameraHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: const Text('vvvvbbb'),
       ),
       // FutureBuilderを実装
       body: FutureBuilder<void>(
@@ -123,32 +130,41 @@ class CameraHomeState extends State<CameraHome> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.camera_alt),
-        // ボタンが押下された際の処理
-        onPressed: () async {
-          try {
+      floatingActionButton: Row(
+        children: [
+          FloatingActionButton(
+            child: const Icon(Icons.camera_alt),
+            // ボタンが押下された際の処理
+            onPressed: () async {
+              try {
+                // 画像を保存するパスを作成する
+                final path = join(
+                  (await getApplicationDocumentsDirectory()).path,
+                  '${DateTime.now()}.png',
+                );
 
-            // 画像を保存するパスを作成する
-            final path = join(
-              (await getApplicationDocumentsDirectory()).path,
-              '${DateTime.now()}.png',
-            );
+                // カメラで画像を撮影する
+                await _cameraController.takePicture(path);
 
-            // カメラで画像を撮影する
-            await _cameraController.takePicture(path);
-
-            // 画像を表示する画面に遷移
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CameraDisplay(imgPath: path),
-              ),
-            );
-          } catch (e) {
-            print(e);
-          }
-        },
+                // 画像を表示する画面に遷移
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CameraDisplay(imgPath: path),
+                  ),
+                );
+              } catch (e) {
+                print(e);
+              }
+            },
+          ),
+          FloatingActionButton(
+            backgroundColor: Colors.redAccent,
+            onPressed: () {
+              print("pressed");
+            },
+          ),
+        ],
       ),
     );
   }
@@ -170,7 +186,6 @@ class CameraDisplay extends StatelessWidget {
         body: Column(
           // Imageウィジェットで画像を表示する
           children: [Expanded(child: Image.file(File(imgPath)))],
-        )
-    );
+        ));
   }
 }
