@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_camera_testing/next_page.dart';
 
 Future<void> main() async {
   // runAppが実行される前に、cameraプラグインを初期化
@@ -17,6 +18,7 @@ Future<void> main() async {
 
   // 利用可能なカメラの一覧から、指定のカメラを取得する
   final firstCamera = cameras.first;
+  final lastCamera = cameras.last;
 
   runApp(MyApp(camera: firstCamera));
 }
@@ -157,6 +159,8 @@ class CameraHomeState extends State<CameraHome> {
                   (await getApplicationDocumentsDirectory()).path,
                   '${DateTime.now()}.png',
                 );
+                print(path);
+                print(11111);
 
                 // カメラで画像を撮影する
                 await _cameraController.takePicture(path);
@@ -173,15 +177,28 @@ class CameraHomeState extends State<CameraHome> {
               }
             },
           ),
+          // Image.network('https://camo.qiitausercontent.com/73d66ebab10b0bf22ad8a7eeb3bc37617de75093/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3336363431322f31656133653330652d633564662d646137612d346566372d6265346134323739616462612e6a706567'),
+          Image(
+            image: NetworkImage('https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+            height: 100,
+            width: 200,
+          ),
+          // TextFieldは配置できる。
+          // TextField(),
           Container( // 余白を設けるためContainerでラップします。
             margin: EdgeInsets.only(bottom: 16.0),
             child: FloatingActionButton(
               // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
-              heroTag: "scan",
-              child: Icon(Icons.title),
+              heroTag: "scan1",
+              // child: Icon(Icons.title),
+              child: Text('次へ'),
               backgroundColor: Colors.pink[200],
               onPressed: () async {
                 // （省略）タップされた際の処理
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NextPage()),
+                );
               },
             ),
           ),
@@ -189,7 +206,7 @@ class CameraHomeState extends State<CameraHome> {
             margin: EdgeInsets.only(bottom: 16.0),
             child: FloatingActionButton(
               // 参考※3よりユニークな名称をつけましょう。ないとエラーになります。
-              heroTag: "scan",
+              heroTag: "scan2",
               child: Icon(Icons.title),
               backgroundColor: Colors.blue[200],
               onPressed: () async {
