@@ -189,7 +189,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           SizedBox(
             width: 90.0,
             child: RadioListTile<CameraDescription>(
-              title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
+              // これでインカメか外カメかわかりやすくなる
+              // title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
               groupValue: controller?.description,
               value: cameraDescription,
               onChanged: controller != null && controller!.value.isRecordingVideo!
@@ -250,52 +251,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
-  }
-
-  void onPauseButtonPressed() {
-    pauseVideoRecording().then((_) {
-      if (mounted) setState(() {});
-      showInSnackBar('Video recording paused');
-    });
-  }
-
-  void onResumeButtonPressed() {
-    resumeVideoRecording().then((_) {
-      if (mounted) setState(() {});
-      showInSnackBar('Video recording resumed');
-    });
-  }
-
-  void toogleAutoFocus() {
-    controller!.setAutoFocus(!controller!.value.autoFocusEnabled!);
-    showInSnackBar('Toogle auto focus');
-  }
-
-
-  Future<void> pauseVideoRecording() async {
-    if (!controller!.value.isRecordingVideo!) {
-      return null;
-    }
-
-    try {
-      await controller!.pauseVideoRecording();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      rethrow;
-    }
-  }
-
-  Future<void> resumeVideoRecording() async {
-    if (!controller!.value.isRecordingVideo!) {
-      return null;
-    }
-
-    try {
-      await controller!.resumeVideoRecording();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      rethrow;
-    }
   }
 
   Future<String?> takePicture() async {
