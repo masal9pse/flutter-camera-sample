@@ -103,8 +103,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(
-                  color: controller != null && controller!.value.isRecordingVideo!
-                      ? Colors.redAccent
+                  color: controller != null
+                      ? Colors.green // 枠線の色
                       : Colors.grey,
                   width: 3.0,
                 ),
@@ -162,8 +162,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           icon: const Icon(Icons.camera_alt),
           color: Colors.blue,
           onPressed: controller != null &&
-              controller!.value.isInitialized! &&
-              !controller!.value.isRecordingVideo!
+              controller!.value.isInitialized!
               ? onTakePictureButtonPressed
               : null,
         ),
@@ -193,7 +192,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               // title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
               groupValue: controller?.description,
               value: cameraDescription,
-              onChanged: controller != null && controller!.value.isRecordingVideo!
+              onChanged: controller != null
                   ? null
                   : onNewCameraSelected,
             ),
