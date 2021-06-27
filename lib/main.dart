@@ -10,7 +10,6 @@ import 'dart:io';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 
 class CameraExampleHome extends StatefulWidget {
   @override
@@ -39,9 +38,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     with WidgetsBindingObserver {
   CameraController? controller;
   String? imagePath;
-  late String videoPath;
-  VideoPlayerController? videoController;
-  late VoidCallback videoPlayerListener;
+  // late String videoPath;
+  // VideoPlayerController? videoController;
+  // late VoidCallback videoPlayerListener;
   bool enableAudio = true;
   FlashMode flashMode = FlashMode.off;
 
@@ -79,6 +78,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        // 先頭のバー
         title: const Text('Camera example2'),
       ),
       body: Column(
@@ -91,7 +91,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                     child: ZoomableWidget(
                         child: _cameraPreviewWidget(),
                         onTapUp: (scaledPoint) {
-                          //controller.setPointOfInterest(scaledPoint);
+                          // controller.setPointOfInterest(scaledPoint);
                         },
                         onZoom: (zoom) {
                           print('zoom');
@@ -112,14 +112,14 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
             ),
           ),
           _captureControlRowWidget(),
-          _toggleAudioWidget(),
+          // _toggleAudioWidget(),
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 _cameraTogglesRowWidget(),
-                _thumbnailWidget(),
+                // _thumbnailWidget(),
               ],
             ),
           ),
@@ -148,59 +148,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   }
 
   /// Toggle recording audio
-  Widget _toggleAudioWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 25),
-      child: Row(
-        children: <Widget>[
-          const Text('Enable Audio:'),
-          Switch(
-            value: enableAudio,
-            onChanged: (bool value) {
-              enableAudio = value;
-              if (controller != null) {
-                onNewCameraSelected(controller!.description);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Display the thumbnail of the captured image or video.
-  Widget _thumbnailWidget() {
-    return Expanded(
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            videoController == null && imagePath == null
-                ? Container()
-                : SizedBox(
-              child: (videoController == null)
-                  ? Image.file(File(imagePath!))
-                  : Container(
-                child: Center(
-                  child: AspectRatio(
-                      aspectRatio:
-                      videoController!.value.size != null
-                          ? videoController!.value.aspectRatio
-                          : 1.0,
-                      child: VideoPlayer(videoController!)),
-                ),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.pink)),
-              ),
-              width: 64.0,
-              height: 64.0,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  /// no-sound-null-safetができてから
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
@@ -217,90 +167,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               ? onTakePictureButtonPressed
               : null,
         ),
-        IconButton(
-          icon: const Icon(Icons.videocam),
-          color: Colors.blue,
-          onPressed: controller != null &&
-              controller!.value.isInitialized! &&
-              !controller!.value.isRecordingVideo!
-              ? onVideoRecordButtonPressed
-              : null,
-        ),
-        IconButton(
-          icon: controller != null && controller!.value.isRecordingPaused
-              ? Icon(Icons.play_arrow)
-              : Icon(Icons.pause),
-          color: Colors.blue,
-          onPressed: controller != null &&
-              controller!.value.isInitialized! &&
-              controller!.value.isRecordingVideo!
-              ? (controller != null && controller!.value.isRecordingPaused
-              ? onResumeButtonPressed
-              : onPauseButtonPressed)
-              : null,
-        ),
-        IconButton(
-          icon: controller != null && controller!.value.autoFocusEnabled!
-              ? Icon(Icons.access_alarm)
-              : Icon(Icons.access_alarms),
-          color: Colors.blue,
-          onPressed: (controller != null && controller!.value.isInitialized!)
-              ? toogleAutoFocus
-              : null,
-        ),
-        _flashButton(),
-        IconButton(
-          icon: const Icon(Icons.stop),
-          color: Colors.red,
-          onPressed: controller != null &&
-              controller!.value.isInitialized! &&
-              controller!.value.isRecordingVideo!
-              ? onStopButtonPressed
-              : null,
-        ),
+        // _flashButton(),
       ],
     );
   }
 
   /// Flash Toggle Button
-  Widget _flashButton() {
-    IconData iconData = Icons.flash_off;
-    Color color = Colors.black;
-    if (flashMode == FlashMode.alwaysFlash) {
-      iconData = Icons.flash_on;
-      color = Colors.blue;
-    } else if (flashMode == FlashMode.autoFlash) {
-      iconData = Icons.flash_auto;
-      color = Colors.red;
-    }
-    return IconButton(
-      icon: Icon(iconData),
-      color: color,
-      onPressed: controller != null && controller!.value.isInitialized!
-          ? _onFlashButtonPressed
-          : null,
-    );
-  }
+  /// あとでもう一度追加する
 
   /// Toggle Flash
-  Future<void> _onFlashButtonPressed() async {
-    bool hasFlash = false;
-    if (flashMode == FlashMode.off || flashMode == FlashMode.torch) {
-      // Turn on the flash for capture
-      flashMode = FlashMode.alwaysFlash;
-    } else if (flashMode == FlashMode.alwaysFlash) {
-      // Turn on the flash for capture if needed
-      flashMode = FlashMode.autoFlash;
-    } else {
-      // Turn off the flash
-      flashMode = FlashMode.off;
-    }
-    // Apply the new mode
-    await controller!.setFlashMode(flashMode);
-
-    // Change UI State
-    setState(() {});
-  }
 
   /// Display a row of toggle to select the camera (or a message if no camera is available).
   Widget _cameraTogglesRowWidget() {
@@ -369,25 +244,11 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       if (mounted) {
         setState(() {
           imagePath = filePath;
-          videoController?.dispose();
-          videoController = null;
+          // videoController?.dispose();
+          // videoController = null;
         });
         if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
-    });
-  }
-
-  void onVideoRecordButtonPressed() {
-    startVideoRecording().then((String? filePath) {
-      if (mounted) setState(() {});
-      if (filePath != null) showInSnackBar('Saving video to $filePath');
-    });
-  }
-
-  void onStopButtonPressed() {
-    stopVideoRecording().then((_) {
-      if (mounted) setState(() {});
-      showInSnackBar('Video recorded to: $videoPath');
     });
   }
 
@@ -410,46 +271,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     showInSnackBar('Toogle auto focus');
   }
 
-  Future<String?> startVideoRecording() async {
-    if (!controller!.value.isInitialized!) {
-      showInSnackBar('Error: select a camera first.');
-      return null;
-    }
-
-    final Directory extDir = await getApplicationDocumentsDirectory();
-    final String dirPath = '${extDir.path}/Movies/flutter_test';
-    await Directory(dirPath).create(recursive: true);
-    final String filePath = '$dirPath/${timestamp()}.mp4';
-
-    if (controller!.value.isRecordingVideo!) {
-      // A recording is already started, do nothing.
-      return null;
-    }
-
-    try {
-      videoPath = filePath;
-      await controller!.startVideoRecording(filePath);
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      return null;
-    }
-    return filePath;
-  }
-
-  Future<void> stopVideoRecording() async {
-    if (!controller!.value.isRecordingVideo!) {
-      return null;
-    }
-
-    try {
-      await controller!.stopVideoRecording();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      return null;
-    }
-
-    await _startVideoPlayer();
-  }
 
   Future<void> pauseVideoRecording() async {
     if (!controller!.value.isRecordingVideo!) {
@@ -475,29 +296,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       _showCameraException(e);
       rethrow;
     }
-  }
-
-  Future<void> _startVideoPlayer() async {
-    final VideoPlayerController vcontroller =
-    VideoPlayerController.file(File(videoPath));
-    videoPlayerListener = () {
-      if (videoController != null && videoController!.value.size != null) {
-        // Refreshing the state to update video player with the correct ratio.
-        if (mounted) setState(() {});
-        videoController!.removeListener(videoPlayerListener);
-      }
-    };
-    vcontroller.addListener(videoPlayerListener);
-    await vcontroller.setLooping(true);
-    await vcontroller.initialize();
-    await videoController?.dispose();
-    if (mounted) {
-      setState(() {
-        imagePath = null;
-        videoController = vcontroller;
-      });
-    }
-    await vcontroller.play();
   }
 
   Future<String?> takePicture() async {
