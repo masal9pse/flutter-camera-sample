@@ -43,11 +43,24 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   // VideoPlayerController? videoController;
   // late VoidCallback videoPlayerListener;
   bool enableAudio = true;
-  FlashMode flashMode = FlashMode.off;
+  FlashMode flashMode = FlashMode.alwaysFlash;
 
   @override
-  void initState() {
+   initState() {
     super.initState();
+    // print(controller.value.isInitialized);
+    // print('aaaa');
+    for (CameraDescription cameraDescription in cameras) {
+       controller = CameraController(
+        cameraDescription,
+        ResolutionPreset.medium,
+        enableAudio: enableAudio,
+      );
+    }
+    // // print(controller.value.isInitialized);
+    // // controller.value.isInitialized = true;
+    // print(controller.value.isInitialized);
+    // print('eeeeeee');
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -132,6 +145,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
+    //   if (controller == null) {
+    //   print(controller.value.isInitialized);
+    //   print('bbnn');
       return const Text(
         'Tap a camera',
         style: TextStyle(
@@ -158,14 +174,15 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
+        children: <Widget>[
         IconButton(
           icon: const Icon(Icons.camera_alt),
           color: Colors.blue,
-          onPressed: controller != null &&
-              controller.value.isInitialized
-              ? onTakePictureButtonPressed
-              : null,
+          // onPressed: controller != null &&
+          //     controller.value.isInitialized
+          //     ? onTakePictureButtonPressed
+          //     : null,
+          onPressed: onTakePictureButtonPressed
         ),
         // _flashButton(),
       ],
@@ -192,10 +209,12 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               // これでインカメか外カメかわかりやすくなる
               // title: Icon(getCameraLensIcon(cameraDescription.lensDirection)),
               groupValue: controller?.description,
+              // groupValue: controller.description,
               value: cameraDescription,
-              onChanged: controller != null
-                  ? null
-                  : onNewCameraSelected,
+              // onChanged: controller != null
+              //     ? null
+              //     : onNewCameraSelected,
+              onChanged: onNewCameraSelected,
             ),
           ),
         );
@@ -303,6 +322,8 @@ Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     cameras = await availableCameras();
+    // print(cameras);
+    // print(33333);
   } on CameraException catch (e) {
     logError(e.code, e.description);
   }
@@ -387,6 +408,11 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
                   child: widget.child,
                 ),
               ),
+              // const SizedBox(
+              //   width: 200.0,
+              //   height: 300.0,
+              //   child: Card(child: Text('Hello World!')),
+              // )
             ],
           ),
           Visibility(
