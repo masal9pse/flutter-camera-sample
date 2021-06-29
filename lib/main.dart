@@ -1,3 +1,4 @@
+// @dart=2.9
 // Copyright 2019 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -19,7 +20,7 @@ class CameraExampleHome extends StatefulWidget {
 }
 
 /// Returns a suitable camera icon for [direction].
-IconData getCameraLensIcon(CameraLensDirection? direction) {
+IconData getCameraLensIcon(CameraLensDirection direction) {
   switch (direction) {
     case CameraLensDirection.back:
       return Icons.camera_rear;
@@ -31,13 +32,13 @@ IconData getCameraLensIcon(CameraLensDirection? direction) {
   throw ArgumentError('Unknown lens direction');
 }
 
-void logError(String code, String? message) =>
+void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
 
 class _CameraExampleHomeState extends State<CameraExampleHome>
     with WidgetsBindingObserver {
-  CameraController? controller;
-  String? imagePath;
+  CameraController controller;
+  String imagePath = '';
   // late String videoPath;
   // VideoPlayerController? videoController;
   // late VoidCallback videoPlayerListener;
@@ -47,26 +48,26 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // App state changed before we got the chance to initialize.
-    if (controller == null || !controller!.value.isInitialized!) {
+    if (controller == null || !controller.value.isInitialized) {
       return;
     }
     if (state == AppLifecycleState.inactive) {
       controller?.dispose();
     } else if (state == AppLifecycleState.resumed) {
       if (controller != null) {
-        onNewCameraSelected(controller!.description);
+        onNewCameraSelected(controller.description);
       }
     }
   }
@@ -79,7 +80,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       key: _scaffoldKey,
       appBar: AppBar(
         // 先頭のバー
-        title: const Text('Camera example2'),
+        title: const Text('Camera example2cc'),
       ),
       body: Column(
         children: <Widget>[
@@ -96,7 +97,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                         onZoom: (zoom) {
                           print('zoom');
                           if (zoom < 11) {
-                            controller!.zoom(zoom);
+                            controller.zoom(zoom);
                           }
                         })),
               ),
@@ -130,7 +131,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
-    if (controller == null || !controller!.value.isInitialized!) {
+    if (controller == null || !controller.value.isInitialized) {
       return const Text(
         'Tap a camera',
         style: TextStyle(
@@ -141,8 +142,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       );
     } else {
       return AspectRatio(
-        aspectRatio: controller!.value.aspectRatio,
-        child: CameraPreview(controller!),
+        aspectRatio: controller.value.aspectRatio,
+        child: CameraPreview(controller),
       );
     }
   }
@@ -162,7 +163,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
           icon: const Icon(Icons.camera_alt),
           color: Colors.blue,
           onPressed: controller != null &&
-              controller!.value.isInitialized!
+              controller.value.isInitialized
               ? onTakePictureButtonPressed
               : null,
         ),
@@ -207,29 +208,29 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
   void showInSnackBar(String message) {
-    _scaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(message)));
+    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void onNewCameraSelected(CameraDescription? cameraDescription) async {
+  void onNewCameraSelected(CameraDescription cameraDescription) async {
     if (controller != null) {
-      await controller!.dispose();
+      await controller.dispose();
     }
     controller = CameraController(
-      cameraDescription!,
+      cameraDescription,
       ResolutionPreset.medium,
       enableAudio: enableAudio,
     );
 
     // If the controller is updated then update the UI.
-    controller!.addListener(() {
+    controller.addListener(() {
       if (mounted) setState(() {});
-      if (controller!.value.hasError) {
-        showInSnackBar('Camera error ${controller!.value.errorDescription}');
+      if (controller.value.hasError) {
+        showInSnackBar('Camera error ${controller.value.errorDescription}');
       }
     });
 
     try {
-      await controller!.initialize();
+      await controller.initialize();
     } on CameraException catch (e) {
       _showCameraException(e);
     }
@@ -240,7 +241,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   }
 
   void onTakePictureButtonPressed() {
-    takePicture().then((String? filePath) {
+    takePicture().then((String filePath) {
       if (mounted) {
         setState(() {
           imagePath = filePath;
@@ -252,8 +253,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     });
   }
 
-  Future<String?> takePicture() async {
-    if (!controller!.value.isInitialized!) {
+  Future<String> takePicture() async {
+    if (!controller.value.isInitialized) {
       showInSnackBar('Error: select a camera first.');
       return null;
     }
@@ -262,13 +263,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     await Directory(dirPath).create(recursive: true);
     final String filePath = '$dirPath/${timestamp()}.jpg';
 
-    if (controller!.value.isTakingPicture!) {
+    if (controller.value.isTakingPicture) {
       // A capture is already pending, do nothing.
       return null;
     }
 
     try {
-      await controller!.takePicture(filePath);
+      await controller.takePicture(filePath);
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
@@ -310,11 +311,11 @@ Future<void> main() async {
 
 //Zoomer this will be a seprate widget
 class ZoomableWidget extends StatefulWidget {
-  final Widget? child;
-  final Function? onZoom;
-  final Function? onTapUp;
+  final Widget child;
+  final Function onZoom;
+  final Function onTapUp;
 
-  const ZoomableWidget({Key? key, this.child, this.onZoom, this.onTapUp})
+  const ZoomableWidget({Key key, this.child, this.onZoom, this.onTapUp})
       : super(key: key);
 
   @override
@@ -326,7 +327,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
   double zoom = 1;
   double prevZoom = 1;
   bool showZoom = false;
-  Timer? t1;
+  Timer t1;
 
   bool handleZoom(newZoom){
     if (newZoom >= 1) {
@@ -339,7 +340,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
       });
 
       if (t1 != null) {
-        t1!.cancel();
+        t1.cancel();
       }
 
       t1 = Timer(Duration(milliseconds: 2000), () {
@@ -348,7 +349,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
         });
       });
     }
-    widget.onZoom!(zoom);
+    widget.onZoom(zoom);
     return true;
 
   }
@@ -383,7 +384,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
             children: <Widget>[
               Container(
                 child: Expanded(
-                  child: widget.child!,
+                  child: widget.child,
                 ),
               ),
             ],
