@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'dart:io';
 
 // import 'package:camera/camera.dart';
@@ -5,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_camera_testing/next_page.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'after_take_picture_camera_view.dart';
@@ -28,7 +30,8 @@ class CameraHome extends StatefulWidget {
   final CameraDescription camera;
 
   // CameraHome({required this.camera});
-  const CameraHome({Key? key, required this.camera}) : super(key: key);
+  // const CameraHome({Key? key, required this.camera}) : super(key: key);
+  const CameraHome({this.camera});
 
   @override
   State<StatefulWidget> createState() => CameraHomeState();
@@ -36,10 +39,10 @@ class CameraHome extends StatefulWidget {
 
 class CameraHomeState extends State<CameraHome> {
   // デバイスのカメラを制御するコントローラ
-  late CameraController _cameraController;
+  CameraController _cameraController;
 
   // コントローラーに設定されたカメラを初期化する関数
-  late Future<void> _initializeCameraController;
+  Future<void> _initializeCameraController;
 
   @override
   void initState() {
@@ -78,7 +81,18 @@ class CameraHomeState extends State<CameraHome> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               // カメラの初期化が完了したら、プレビューを表示
-              return CameraPreview(_cameraController);
+              // return CameraPreview(_cameraController);
+              return ZoomableWidget(
+                  child: CameraPreview(_cameraController),
+                  onTapUp: (scaledPoint) {
+                    // controller.setPointOfInterest(scaledPoint);
+                  },
+                  onZoom: (zoom) {
+                    print('zoom');
+                    if (zoom < 11) {
+                      _cameraController.zoom(zoom);
+                    }
+                  });
             } else {
               // カメラの初期化中はインジケーターを表示
               return const Center(child: CircularProgressIndicator());
