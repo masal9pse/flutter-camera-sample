@@ -1,4 +1,5 @@
-// @dart=2.9
+// https://flutter.dev/docs/cookbook/plugins/picture-using-camera
+
 import 'dart:io';
 
 // import 'package:camera/camera.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_camera_testing/next_page.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'after_take_picture_camera_view.dart';
 import 'package:flutter/material.dart';
 
@@ -21,112 +21,52 @@ Future<void> main() async {
 
   print(cameras);
 // 利用可能なカメラの一覧から、指定のカメラを取得する
-  final firstCamera = cameras[0];
+  final firstCamera = cameras.first;
   // runApp(MyApp());
-  runApp(CameraHome(camera: firstCamera));
+  runApp(TakePictureScreen(camera: firstCamera));
 }
 
-class CameraHome extends StatefulWidget {
+// A screen that allows users to take a picture using a given camera.
+class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
 
-  // CameraHome({required this.camera});
-  // const CameraHome({Key? key, required this.camera}) : super(key: key);
-  const CameraHome({this.camera});
+  const TakePictureScreen({
+    Key? key,
+    required this.camera,
+  }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => CameraHomeState();
+  TakePictureScreenState createState() => TakePictureScreenState();
 }
 
-class CameraHomeState extends State<CameraHome> {
-  // デバイスのカメラを制御するコントローラ
-  CameraController _cameraController;
-
-  // コントローラーに設定されたカメラを初期化する関数
-  Future<void> _initializeCameraController;
+class TakePictureScreenState extends State<TakePictureScreen> {
+  late CameraController _controller;
 
   @override
   void initState() {
     super.initState();
+    // To display the current output from the Camera,
+    // create a CameraController.
+    _controller = CameraController(
+      // Get a specific camera from the list of available cameras.
+      widget.camera,
+      // Define the resolution to use.
+      ResolutionPreset.medium,
+    );
 
-    // ②
-    // コントローラを初期化
-    _cameraController = CameraController(
-        // 使用するカメラをコントローラに設定
-        widget.camera,
-        ResolutionPreset.max);
-    // ③
-    // コントローラーに設定されたカメラを初期化
-    _initializeCameraController = _cameraController.initialize();
+    // Next, initialize the controller. This returns a Future.
   }
 
-  // ④
   @override
   void dispose() {
-    // ウィジェットが破棄されたタイミングで、カメラのコントローラを破棄する
-    _cameraController.dispose();
+    // Dispose of the controller when the widget is disposed.
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Welcome to Flutter',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('カメラ画面'),
-        ),
-        // FutureBuilderを実装
-        body: FutureBuilder<void>(
-          future: _initializeCameraController,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              // カメラの初期化が完了したら、プレビューを表示
-              // return CameraPreview(_cameraController);
-              return ZoomableWidget(
-                  child: CameraPreview(_cameraController),
-                  onTapUp: (scaledPoint) {
-                    // controller.setPointOfInterest(scaledPoint);
-                  },
-                  onZoom: (zoom) {
-                    print('zoom');
-                    if (zoom < 11) {
-                      _cameraController.zoom(zoom);
-                    }
-                  });
-            } else {
-              // カメラの初期化中はインジケーターを表示
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.camera_alt),
-          // ボタンが押下された際の処理
-          onPressed: () async {
-            try {
-              // 画像を保存するパスを作成する
-              final path = join(
-                (await getApplicationDocumentsDirectory()).path,
-                '${DateTime.now()}.png',
-              );
-              print(12345);
-              print(path);
-              // カメラで画像を撮影する
-              await _cameraController.takePicture(path);
-
-              // 画像を表示する画面に遷移
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CameraView(imgPath: path),
-                ),
-              );
-            } catch (e) {
-              print(e);
-            }
-          },
-        ),
-      ),
-    );
+    // Fill this out in the next steps.
+    return Container();
   }
 }
