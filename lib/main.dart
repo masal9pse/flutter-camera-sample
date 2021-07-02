@@ -90,7 +90,7 @@ class CameraHomeState extends State<CameraHome> {
           title: const Text('カメラ画面'),
         ),
         // FutureBuilderを実装
-        body: Column(
+        body: Stack(
           children: [
             Expanded(
               child: FutureBuilder<void>(
@@ -120,7 +120,21 @@ class CameraHomeState extends State<CameraHome> {
                 },
               ),
             ),
-            TextField()
+            // TextField(),
+            const Image(
+              image: NetworkImage(
+                  'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+              height: 100,
+              width: 200,
+            ),
+            ElevatedButton(
+              child: const Text('Button'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.orange,
+                onPrimary: Colors.white,
+              ),
+              onPressed: () {},
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
