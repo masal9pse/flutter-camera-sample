@@ -90,31 +90,38 @@ class CameraHomeState extends State<CameraHome> {
           title: const Text('カメラ画面'),
         ),
         // FutureBuilderを実装
-        body: FutureBuilder<void>(
-          future: _initializeCameraController,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              // カメラの初期化が完了したら、プレビューを表示
-              // return CameraPreview(_cameraController);
-              return RotatedBox(
-                quarterTurns: 3,
-                child: ZoomableWidget(
-                    child: CameraPreview(_cameraController),
-                    onTapUp: (scaledPoint) {
-                      // controller.setPointOfInterest(scaledPoint);
-                    },
-                    onZoom: (zoom) {
-                      print('zoom');
-                      if (zoom < 11) {
-                        _cameraController.zoom(zoom);
-                      }
-                    }),
-              );
-            } else {
-              // カメラの初期化中はインジケーターを表示
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<void>(
+                future: _initializeCameraController,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // カメラの初期化が完了したら、プレビューを表示
+                    // return CameraPreview(_cameraController);
+                    return RotatedBox(
+                      quarterTurns: 3,
+                      child: ZoomableWidget(
+                          child: CameraPreview(_cameraController),
+                          onTapUp: (scaledPoint) {
+                            // controller.setPointOfInterest(scaledPoint);
+                          },
+                          onZoom: (zoom) {
+                            print('zoom');
+                            if (zoom < 11) {
+                              _cameraController.zoom(zoom);
+                            }
+                          }),
+                    );
+                  } else {
+                    // カメラの初期化中はインジケーターを表示
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+            TextField()
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.camera_alt),
