@@ -7,10 +7,12 @@ import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_camera_testing/next_page.dart';
+import 'package:flutter_camera_testing/zoom_able.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'after_take_picture_camera_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 追加
 
 Future<void> main() async {
   // runAppが実行される前に、cameraプラグインを初期化
@@ -23,7 +25,14 @@ Future<void> main() async {
 // 利用可能なカメラの一覧から、指定のカメラを取得する
   final firstCamera = cameras[0];
   // runApp(MyApp());
-  runApp(CameraHome(camera: firstCamera));
+  // SystemChrome.setPreferredOrientations([
+  //   // DeviceOrientation.landscapeLeft,
+  //   DeviceOrientation.landscapeRight,
+  // ]).then((_) {
+    // runApp(new MyApp());
+    runApp(CameraHome(camera: firstCamera));
+  // });
+  // runApp(CameraHome(camera: firstCamera));
 }
 
 class CameraHome extends StatefulWidget {
@@ -48,6 +57,11 @@ class CameraHomeState extends State<CameraHome> {
   void initState() {
     super.initState();
 
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeRight,
+    //   // DeviceOrientation.portraitUp,
+    //   // DeviceOrientation.portraitDown,
+    // ]);
     // ②
     // コントローラを初期化
     _cameraController = CameraController(
