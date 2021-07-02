@@ -40,6 +40,7 @@ dependencies:
 #  flutter_better_camera: ^1.0.2+1
   video_player: ^2.1.6
   camera_camera: ^2.0.2
+  native_device_orientation: ^1.0.0
 
 dev_dependencies:
   flutter_test:
