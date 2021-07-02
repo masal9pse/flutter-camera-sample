@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+
 // import 'package:camera/camera.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ Future<void> main() async {
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
 
-  const TakePictureScreen({
+  TakePictureScreen({
     Key? key,
     required this.camera,
   }) : super(key: key);
@@ -43,6 +44,9 @@ class TakePictureScreen extends StatefulWidget {
 
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
+
+  // String? imagePath;
+  String? path;
   late Future<void> _initializeControllerFuture;
 
   @override
@@ -68,6 +72,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.dispose();
   }
 
+  bool isViewPhoto = false;
+
+  // void onTakePictureButtonPressed() {
+  //   takePicture().then((String? filePath) {
+  //     if (mounted) {
+  //       setState(() {
+  //         path = filePath;
+  //       });
+  //     }
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,42 +103,95 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
+      floatingActionButton: Row(
+        children: [
+          FloatingActionButton(
+            // Provide an onPressed callback.
+            onPressed: () async {
+              // Take the Picture in a try / catch block. If anything goes wrong,
+              // catch the error.
+              try {
+                // Ensure that the camera is initialized.
+                await _initializeControllerFuture;
 
-            // 画像を保存するパスを作成する
-            final path = join(
-              (await getApplicationDocumentsDirectory()).path,
-              '${DateTime.now()}.png',
-            );
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            final image = await _controller.takePicture(path);
+                // 画像を保存するパスを作成する
+                final path = join(
+                  (await getApplicationDocumentsDirectory()).path,
+                  '${DateTime.now()}.png',
+                );
+                 if (mounted) {
+                  setState(() {
+                    path = filePath;
+                  });
+                }
+                // Attempt to take a picture and get the file `image`
+                // where it was saved.
+                // final image = await _controller.takePicture(path);
+                await _controller.takePicture(path);
 
-            // If the picture was taken, display it on a new screen.
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: path,
+                isViewPhoto = true;
+
+                // If the picture was taken, display it on a new screen.
+                // await Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => DisplayPictureScreen(
+                //       // Pass the automatically generated path to
+                //       // the DisplayPictureScreen widget.
+                //       imagePath: path,
+                //     ),
+                //   ),
+                // );
+
+              } catch (e) {
+                // If an error occurs, log the error to the console.
+                print(e);
+              }
+            },
+            child: const Icon(Icons.camera_alt),
+          ),
+          // _thumbnailWidget(),
+          // imagePath == null && isViewPhoto ? Text('masato') :
+          path == null
+              ? Image(
+                  image: NetworkImage(
+                      'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+                  height: 100,
+                  width: 200,
+                )
+              : SizedBox(
+                  // width: 30,
+                  // height: 100,
+                  // child: Image.file(File(imagePath!)),
+                  child: Image.file(File(path!)),
                 ),
-              ),
-            );
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+        ],
       ),
     );
+  }
+
+  /// Display the thumbnail of the captured image or video.
+  Widget _thumbnailWidget() {
+    return Expanded(
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            path == null
+                ? Container()
+                : SizedBox(
+                    width: 30,
+                    height: 100,
+                    // child: Image.file(File(imagePath!)),
+                    child: Image.file(File(path!)),
+                  ),
+          ],
+        ),
+      ),
+    );
+    // if(isViewPhoto) {
+    //   return Image.file(File(imagePath!));
+    // }
   }
 }
 
@@ -130,7 +199,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath}) : super(key: key);
+  const DisplayPictureScreen({Key? key, required this.imagePath})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
