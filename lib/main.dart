@@ -13,6 +13,8 @@ Future<void> main() async {
   SystemChrome.setEnabledSystemUIOverlays([]);
   // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
   // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.landscapeRight]);
   print(3333);
   cameras = await availableCameras();
   // print(cameras);
@@ -35,7 +37,7 @@ class _Cam extends State<Cam> {
   @override
   void initState() {
     super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.ultraHigh);
+    controller = CameraController(cameras[0], ResolutionPreset.max);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -58,10 +60,12 @@ class _Cam extends State<Cam> {
 
     return Scaffold(
       body: NativeDeviceOrientationReader(builder: (context) {
-        NativeDeviceOrientation orientation =
-        NativeDeviceOrientationReader.orientation(context);
-
+        NativeDeviceOrientation orientation = NativeDeviceOrientationReader.orientation(context);
+        print(orientation);
+        print(NativeDeviceOrientation);
         int turns;
+        print(turns);
+        // NativeDeviceOrientationは現在のデバイスのむきを取得する
         switch (orientation) {
           case NativeDeviceOrientation.landscapeLeft:
             turns = -1;
@@ -89,14 +93,25 @@ class _Cam extends State<Cam> {
         //     ),
         //   ),
         // );
-        return RotatedBox(
-          quarterTurns: turns,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: controller.value.aspectRatio,
-                child: CameraPreview(controller),
+        return Column(
+          children: [
+            Container(
+              height: 300,
+              child: RotatedBox(
+                quarterTurns: turns,
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: controller.value.aspectRatio,
+                      child: CameraPreview(controller),
+                    ),
+                  ),
               ),
             ),
+            //  RotatedBox(
+            //   quarterTurns: 1,
+            //   child: Text('Hello World!'),
+            // )
+          ],
         );
         // return RotatedBox(
         //     child: AspectRatio(
