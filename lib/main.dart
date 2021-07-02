@@ -45,8 +45,8 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
 
-  // String? imagePath;
-  String? path;
+   String imagePath = "";
+  // String? path;
   late Future<void> _initializeControllerFuture;
 
   @override
@@ -119,11 +119,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   (await getApplicationDocumentsDirectory()).path,
                   '${DateTime.now()}.png',
                 );
-                 if (mounted) {
                   setState(() {
-                    path = filePath;
+                    imagePath = path;
                   });
-                }
                 // Attempt to take a picture and get the file `image`
                 // where it was saved.
                 // final image = await _controller.takePicture(path);
@@ -151,8 +149,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           ),
           // _thumbnailWidget(),
           // imagePath == null && isViewPhoto ? Text('masato') :
-          path == null
-              ? Image(
+          imagePath == null
+              ? const Image(
                   image: NetworkImage(
                       'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
                   height: 100,
@@ -161,8 +159,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               : SizedBox(
                   // width: 30,
                   // height: 100,
-                  // child: Image.file(File(imagePath!)),
-                  child: Image.file(File(path!)),
+                  child: Image.file(File(imagePath)),
+                  // child: Image.file(File(path!)),
                 ),
         ],
       ),
@@ -177,13 +175,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            path == null
+            imagePath == ""
                 ? Container()
                 : SizedBox(
                     width: 30,
                     height: 100,
-                    // child: Image.file(File(imagePath!)),
-                    child: Image.file(File(path!)),
+                    child: Image.file(File(imagePath)),
+                    // child: Image.file(File(path!)),
                   ),
           ],
         ),
@@ -196,19 +194,19 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 }
 
 // A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
-    );
-  }
-}
+// class DisplayPictureScreen extends StatelessWidget {
+//   final String imagePath;
+//
+//   const DisplayPictureScreen({Key? key, required this.imagePath})
+//       : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Display the Picture')),
+//       // The image is stored as a file on the device. Use the `Image.file`
+//       // constructor with the given path to display the image.
+//       body: Image.file(File(imagePath)),
+//     );
+//   }
+// }
