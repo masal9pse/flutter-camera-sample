@@ -25,13 +25,13 @@ Future<void> main() async {
 // 利用可能なカメラの一覧から、指定のカメラを取得する
   final firstCamera = cameras[0];
   // runApp(MyApp());
-  // SystemChrome.setPreferredOrientations([
-  //   // DeviceOrientation.landscapeLeft,
-  //   DeviceOrientation.landscapeRight,
-  // ]).then((_) {
+  SystemChrome.setPreferredOrientations([
+    // DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]).then((_) {
     // runApp(new MyApp());
     runApp(CameraHome(camera: firstCamera));
-  // });
+  });
   // runApp(CameraHome(camera: firstCamera));
 }
 
@@ -96,17 +96,20 @@ class CameraHomeState extends State<CameraHome> {
             if (snapshot.connectionState == ConnectionState.done) {
               // カメラの初期化が完了したら、プレビューを表示
               // return CameraPreview(_cameraController);
-              return ZoomableWidget(
-                  child: CameraPreview(_cameraController),
-                  onTapUp: (scaledPoint) {
-                    // controller.setPointOfInterest(scaledPoint);
-                  },
-                  onZoom: (zoom) {
-                    print('zoom');
-                    if (zoom < 11) {
-                      _cameraController.zoom(zoom);
-                    }
-                  });
+              return RotatedBox(
+                quarterTurns: 3,
+                child: ZoomableWidget(
+                    child: CameraPreview(_cameraController),
+                    onTapUp: (scaledPoint) {
+                      // controller.setPointOfInterest(scaledPoint);
+                    },
+                    onZoom: (zoom) {
+                      print('zoom');
+                      if (zoom < 11) {
+                        _cameraController.zoom(zoom);
+                      }
+                    }),
+              );
             } else {
               // カメラの初期化中はインジケーターを表示
               return const Center(child: CircularProgressIndicator());
