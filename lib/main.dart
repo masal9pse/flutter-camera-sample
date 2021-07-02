@@ -1,78 +1,110 @@
-import 'dart:io';
-// import "package:camera_camera/camera_camera.dart";
-import 'package:camera_camera/camera_camera.dart';
-// import 'package:flutter_better_camera/camera.dart';
+// @dart=2.9
+import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
+import 'package:camera/camera.dart';
+import 'package:native_device_orientation/native_device_orientation.dart';
+// import 'package:ar_war/cam.dart';
+import 'package:flutter/services.dart';
+List<CameraDescription> cameras;
+Future<void> main() async {
+  // これを追加しないと動かない
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays([]);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
+  print(3333);
+  cameras = await availableCameras();
+  // print(cameras);
+  runApp(MaterialApp(
+    home: Cam(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
+
+class Cam extends StatefulWidget {
+  // @override
+  //   const MyApp({Key key, @required this.camera}) : super(key: key);
+
+  _Cam createState() => _Cam();
+}
+
+class _Cam extends State<Cam> {
+  CameraController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = CameraController(cameras[0], ResolutionPreset.ultraHigh);
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Camera Camera 2.0',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Camera Camera 2.0'),
-    );
-  }
-}
+    if (!controller.value.isInitialized) {
+      return Container();
+    }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final photos = <File>[];
-
-  void openCamera() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => CameraCamera(
-              onFile: (file) {
-                photos.add(file);
-                Navigator.pop(context);
-                setState(() {});
-              },
-            )));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: GridView.builder(
-        gridDelegate:
-        SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-        itemCount: photos.length,
-        itemBuilder: (_, index) => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: size.width,
-            child: Image.file(
-              photos[index],
-              fit: BoxFit.cover,
+      body: NativeDeviceOrientationReader(builder: (context) {
+        NativeDeviceOrientation orientation =
+        NativeDeviceOrientationReader.orientation(context);
+
+        int turns;
+        switch (orientation) {
+          case NativeDeviceOrientation.landscapeLeft:
+            turns = -1;
+            break;
+          case NativeDeviceOrientation.landscapeRight:
+            turns = 1;
+            break;
+          case NativeDeviceOrientation.portraitDown:
+            turns = 2;
+            break;
+          default:
+            turns = 0;
+            break;
+        }
+
+        // return RotatedBox(
+        //   quarterTurns: turns,
+        //   child: Transform.scale(
+        //     scale: 1 / controller.value.aspectRatio,
+        //     child: Center(
+        //       child: AspectRatio(
+        //         aspectRatio: controller.value.aspectRatio,
+        //         child: CameraPreview(controller),
+        //       ),
+        //     ),
+        //   ),
+        // );
+        return RotatedBox(
+          quarterTurns: turns,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: controller.value.aspectRatio,
+                child: CameraPreview(controller),
+              ),
             ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: openCamera,
-        child: Icon(Icons.camera_alt),
-      ),
+        );
+        // return RotatedBox(
+        //     child: AspectRatio(
+        //       aspectRatio: controller.value.aspectRatio,
+        //       child: CameraPreview(controller),
+        //     ),
+        // );
+      }),
     );
   }
 }
