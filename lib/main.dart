@@ -147,6 +147,12 @@ class CameraHomeState extends State<CameraHome> {
               ),
               onPressed: () {},
             ),
+            Switch(
+              activeColor: Colors.orange,
+              activeTrackColor: Colors.red,
+              inactiveThumbColor: Colors.blue,
+              inactiveTrackColor: Colors.green,
+            )
           ],
         ),
         floatingActionButton: FloatingActionButton(
