@@ -121,11 +121,14 @@ class CameraHomeState extends State<CameraHome> {
               ),
             ),
             // TextField(),
-            const Image(
-              image: NetworkImage(
-                  'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-              height: 100,
-              width: 200,
+            Container(
+              margin: EdgeInsets.only(top: 100,left:0),
+              child: const Image(
+                image: NetworkImage(
+                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
+                height: 100,
+                width: 200,
+              ),
             ),
             ElevatedButton(
               child: const Text('Button'),
@@ -152,13 +155,15 @@ class CameraHomeState extends State<CameraHome> {
               // カメラで画像を撮影する
               await _cameraController.takePicture(path);
 
-              // 画像を表示する画面に遷移
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CameraView(imgPath: path),
-                ),
-              );
+              // 画像を表示する画面に遷移しない......
+              dispose();
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     // builder: (context) => CameraView(imgPath: path),
+              //     //   builder: (context) => dispose()
+              //   ),
+              // );
             } catch (e) {
               print(e);
             }
