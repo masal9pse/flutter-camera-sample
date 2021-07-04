@@ -88,7 +88,8 @@ class CameraHomeState extends State<CameraHome> {
     _cameraController.dispose();
     super.dispose();
   }
-
+  // bool flag = true;
+  bool flag = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -163,7 +164,9 @@ class CameraHomeState extends State<CameraHome> {
               print(path);
               // カメラで画像を撮影する
               await _cameraController.takePicture(path);
-              _saveImage(File(path));
+              if(flag){
+                _saveImage(File(path));
+              }
               // 画像を表示する画面に遷移しない......
               // dispose();
               // Navigator.push(
