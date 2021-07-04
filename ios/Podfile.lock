@@ -2,6 +2,10 @@ PODS:
   - Flutter (1.0.0)
   - flutter_better_camera (0.6.0):
     - Flutter
+  - image_gallery_saver (1.5.0):
+    - Flutter
+  - image_picker (0.0.1):
+    - Flutter
   - native_device_orientation (0.0.1):
     - Flutter
   - path_provider (0.0.1):
@@ -12,6 +16,8 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_better_camera (from `.symlinks/plugins/flutter_better_camera/ios`)
+  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
+  - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - native_device_orientation (from `.symlinks/plugins/native_device_orientation/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - video_player (from `.symlinks/plugins/video_player/ios`)
@@ -21,6 +27,10 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_better_camera:
     :path: ".symlinks/plugins/flutter_better_camera/ios"
+  image_gallery_saver:
+    :path: ".symlinks/plugins/image_gallery_saver/ios"
+  image_picker:
+    :path: ".symlinks/plugins/image_picker/ios"
   native_device_orientation:
     :path: ".symlinks/plugins/native_device_orientation/ios"
   path_provider:
@@ -31,6 +41,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_better_camera: f0dcb72bf079742d017c71b67d42324d9987fa30
+  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
+  image_picker: e06f7a68f000bd36f552c1847e33cda96ed31f1f
   native_device_orientation: 3b4cfc9565a7b879cc4fde282b3e27745e852d0d
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
