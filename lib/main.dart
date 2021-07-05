@@ -92,9 +92,10 @@ class CameraHomeState extends State<CameraHome> {
   // bool flag = true;
   bool flag = false;
   bool _active = false;
-
+  String path = '';
   void _changeSwitch(bool e) => setState(() => _active = e);
-
+  void _afterTakePicture() => setState(() => flag = true);
+  // void _changeSwitch() => setState(() => _active = true);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -109,24 +110,33 @@ class CameraHomeState extends State<CameraHome> {
             Expanded(
               child: FutureBuilder<void>(
                 future: _initializeCameraController,
+                // ignore: missing_return
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     // カメラの初期化が完了したら、プレビューを表示
                     // return CameraPreview(_cameraController);
-                    return RotatedBox(
-                      quarterTurns: 3,
-                      child: ZoomableWidget(
-                          child: CameraPreview(_cameraController),
-                          onTapUp: (scaledPoint) {
-                            // controller.setPointOfInterest(scaledPoint);
-                          },
-                          onZoom: (zoom) {
-                            print('zoom');
-                            if (zoom < 11) {
-                              _cameraController.zoom(zoom);
-                            }
-                          }),
-                    );
+                    if(flag == false){
+                      return RotatedBox(
+                        quarterTurns: 3,
+                        child: ZoomableWidget(
+                            child: CameraPreview(_cameraController),
+                            onTapUp: (scaledPoint) {
+                              // controller.setPointOfInterest(scaledPoint);
+                            },
+                            onZoom: (zoom) {
+                              print('zoom');
+                              if (zoom < 11) {
+                                _cameraController.zoom(zoom);
+                              }
+                            }),
+                      );
+                    }else{
+                      return Column(
+                        children: [
+                          Expanded(child: Image.file(File(path))),
+                        ],
+                      );
+                    }
                   } else {
                     // カメラの初期化中はインジケーターを表示
                     return const Center(child: CircularProgressIndicator());
@@ -168,7 +178,7 @@ class CameraHomeState extends State<CameraHome> {
           onPressed: () async {
             try {
               // 画像を保存するパスを作成する
-              final path = join(
+               path = join(
                 (await getApplicationDocumentsDirectory()).path,
                 '${DateTime.now()}.png',
               );
@@ -180,6 +190,7 @@ class CameraHomeState extends State<CameraHome> {
               if (flag) {
                 _saveImage(File(path));
               }
+               _afterTakePicture();
               // 画像を表示する画面に遷移しない......
               // dispose();
               // Navigator.push(
