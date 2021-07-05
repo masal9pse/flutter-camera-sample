@@ -55,7 +55,7 @@ class CameraHomeState extends State<CameraHome> {
 
   // 画像の保存
   Future _saveImage(File _image) async {
-    if(_image != null) {
+    if (_image != null) {
       Uint8List _buffer = await _image.readAsBytes();
       final result = await ImageGallerySaver.saveImage(_buffer);
     }
@@ -73,7 +73,7 @@ class CameraHomeState extends State<CameraHome> {
     // ②
     // コントローラを初期化
     _cameraController = CameraController(
-      // 使用するカメラをコントローラに設定
+        // 使用するカメラをコントローラに設定
         widget.camera,
         ResolutionPreset.max);
     // ③
@@ -88,8 +88,13 @@ class CameraHomeState extends State<CameraHome> {
     _cameraController.dispose();
     super.dispose();
   }
+
   // bool flag = true;
   bool flag = false;
+  bool _active = false;
+
+  void _changeSwitch(bool e) => setState(() => _active = e);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -131,7 +136,7 @@ class CameraHomeState extends State<CameraHome> {
             ),
             // TextField(),
             Container(
-              margin: EdgeInsets.only(top: 100,left:0),
+              margin: EdgeInsets.only(top: 100, left: 0),
               child: const Image(
                 image: NetworkImage(
                     'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
@@ -148,10 +153,12 @@ class CameraHomeState extends State<CameraHome> {
               onPressed: () {},
             ),
             Switch(
+              value: _active,
               activeColor: Colors.orange,
               activeTrackColor: Colors.red,
               inactiveThumbColor: Colors.blue,
               inactiveTrackColor: Colors.green,
+              onChanged: _changeSwitch,
             )
           ],
         ),
@@ -170,7 +177,7 @@ class CameraHomeState extends State<CameraHome> {
               print(path);
               // カメラで画像を撮影する
               await _cameraController.takePicture(path);
-              if(flag){
+              if (flag) {
                 _saveImage(File(path));
               }
               // 画像を表示する画面に遷移しない......
