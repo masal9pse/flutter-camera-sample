@@ -4,7 +4,6 @@ flutterのカメラの練習中です。
 -  path: ^1.7.0
 -  flutter_better_camera: ^1.0.2+1
 -  image_gallery_saver: ^1.6.9
--  image_picker: ^0.8.0+4
 
 # 機能
 - 横固定

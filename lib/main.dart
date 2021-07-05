@@ -95,6 +95,7 @@ class CameraHomeState extends State<CameraHome> {
   String path = '';
   void _changeSwitch(bool e) => setState(() => _active = e);
   void _afterTakePicture() => setState(() => flag = true);
+  void _afterTakePicture2() => setState(() => flag = false);
   // void _changeSwitch() => setState(() => _active = true);
   @override
   Widget build(BuildContext context) {
@@ -133,9 +134,10 @@ class CameraHomeState extends State<CameraHome> {
                     }else{
                       return Column(
                         children: [
-                          Expanded(child: Image.file(File(path))),
+                          Image.file(File(path)),
                         ],
                       );
+                      // return Image.file(File(path));
                     }
                   } else {
                     // カメラの初期化中はインジケーターを表示
@@ -155,12 +157,27 @@ class CameraHomeState extends State<CameraHome> {
               ),
             ),
             ElevatedButton(
-              child: const Text('Button'),
+              child: const Text('再撮影'),
               style: ElevatedButton.styleFrom(
                 primary: Colors.orange,
                 onPrimary: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () {
+                if (flag == false){
+                  print(3333);
+                  return null;
+                }
+                // カメラをもう一度起動する
+                // initState();
+                // _cameraController = CameraController(
+                //   // 使用するカメラをコントローラに設定
+                //     widget.camera,
+                //     ResolutionPreset.max);
+                // // ③
+                // // コントローラーに設定されたカメラを初期化
+                // _initializeCameraController = _cameraController.initialize();
+                _afterTakePicture2();
+              },
             ),
             Switch(
               value: _active,
