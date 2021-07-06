@@ -96,6 +96,11 @@ class CameraHomeState extends State<CameraHome> {
   void _changeSwitch(bool e) => setState(() => _active = e);
   void _afterTakePicture() => setState(() => flag = true);
   void _afterTakePicture2() => setState(() => flag = false);
+  // setStateを使わないと、再撮影ができなかった。
+  // void _afterTakePicture2() {
+  //   // カメラを元に戻す
+  //   flag = false;
+  // }
   // void _changeSwitch() => setState(() => _active = true);
   @override
   Widget build(BuildContext context) {
@@ -204,6 +209,7 @@ class CameraHomeState extends State<CameraHome> {
               print(path);
               // カメラで画像を撮影する
               await _cameraController.takePicture(path);
+              // switchバーのオンオフで切り替える
               if (flag) {
                 _saveImage(File(path));
               }
