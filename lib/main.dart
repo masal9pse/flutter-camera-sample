@@ -152,15 +152,19 @@ class CameraHomeState extends State<CameraHome> {
               ),
             ),
             // TextField(),
-            Container(
-              margin: EdgeInsets.only(top: 100, left: 0),
+            Positioned(
+                // left: 20.0,
+                top: 220.0,
+                width: 100.0,
+                height: 100.0,
+                child: Container(
               child: const Image(
                 image: NetworkImage(
                     'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-                height: 100,
-                width: 200,
+                // height: 100,
+                // width: 200,
               ),
-            ),
+            )),
             ElevatedButton(
               child: const Text('再撮影'),
               style: ElevatedButton.styleFrom(
