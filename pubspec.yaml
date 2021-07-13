@@ -43,6 +43,7 @@ dependencies:
   image_gallery_saver: ^1.6.9
   image_picker: ^0.8.0+4
   camera: ^0.8.1+4
+  flutter_image_compress: ^1.0.0
 #  camera_camera: ^2.0.2
 
 dev_dependencies:
