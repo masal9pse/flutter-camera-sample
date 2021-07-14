@@ -35,8 +35,10 @@ class _MyHomePageState extends State<MyHomePage> {
     ByteData imageData = await rootBundle.load('images/test.png');
     _image = imgLib.decodeImage(Uint8List.view(imageData.buffer));
     // imgLib.copyRotate(_image, 90);
-    _imageBytes = imgLib.encodeJpg(_image);
-    setState((){});
+    // _imageBytes = imgLib.encodeJpg(_image);
+    var image = imgLib.copyRotate(_image,135);
+    _imageBytes = imgLib.encodeJpg(image);
+    // setState((){});
   }
 
   // 初期化
@@ -81,10 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
 //                 var image = imgLib.copyResize(_image, width: 200);
                 var image = imgLib.copyRotate(_image,180);
                 // ----- フィルター処理テスト
-                imgLib.vignette(image);
-                imgLib.gaussianBlur(image, 5);
-                imgLib.grayscale(image);
-                imgLib.copyRotate(image, 120);
+                // imgLib.vignette(image);
+                // imgLib.gaussianBlur(image, 5);
+                // imgLib.grayscale(image);
+                // imgLib.copyRotate(image, 120);
                 // imgLib.copyResize(image,width: 120);
                 // -----
                 _imageBytes = imgLib.encodeJpg(image);
