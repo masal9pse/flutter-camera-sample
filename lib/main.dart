@@ -4,7 +4,15 @@ import 'package:flutter/services.dart'; // rootBundle
 import 'package:image/image.dart' as imgLib; // <- Dart Image Library
 import 'dart:typed_data'; // Uint8List
 
-void main() => runApp(MyApp());
+void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,//縦固定
+  ]);
+  runApp(MyApp());
+}
 
 // MyApp ウィジェットクラス
 class MyApp extends StatelessWidget {
@@ -12,7 +20,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData.light(),
-      home: MyHomePage(title: 'Dart Image Library'),
+      // home: MyHomePage(title: 'Dart Image Library'),
+      home: const RotatedBox(
+        quarterTurns: 1,
+        child: Text('Hello World!'),
+      )
     );
   }
 }
@@ -34,9 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void loadAssetImage() async {
     ByteData imageData = await rootBundle.load('images/test.png');
     _image = imgLib.decodeImage(Uint8List.view(imageData.buffer));
+
     // imgLib.copyRotate(_image, 90);
     // _imageBytes = imgLib.encodeJpg(_image);
-    var image = imgLib.copyRotate(_image,135);
+    var image = imgLib.copyRotate(_image,90);
     _imageBytes = imgLib.encodeJpg(image);
     // setState((){});
   }
