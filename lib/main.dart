@@ -143,7 +143,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
         MediaQuery.of(context).size.height < 400)
-        ? 150.0
+        ? 500.0
         : 300.0;
     // To ensure the Scanner view is properly sizes after rotation
     // we need to listen for Flutter SizeChanged notification and update controller
@@ -167,8 +167,37 @@ class _QRViewExampleState extends State<QRViewExample> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
+        if(resultList.contains(scanData.code) == false){
+          // 1ごとに配列に入れたい
+          resultList.add(scanData.code);
+          if(resultList.contains('2/所沢s　　xxxxxxxx')){
+            // Navigator.pop(context);
+            showDialog(
+              context: context,
+              builder: (_) {
+                return AlertDialog(
+                  title: Text("タイトル"),
+                  content: Text("メッセージメッセージメッセージメッセージメッセージメッセージ"),
+                  actions: <Widget>[
+                    // ボタン領域
+                    FlatButton(
+                      child: Text("Cancel"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        }
       });
+      print(resultList);
     });
+    // print(resultList);
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
@@ -186,3 +215,5 @@ class _QRViewExampleState extends State<QRViewExample> {
     super.dispose();
   }
 }
+
+List<String> resultList = [];
