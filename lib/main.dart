@@ -1,114 +1,188 @@
-// @dart=2.9
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // rootBundle
-import 'package:image/image.dart' as imgLib; // <- Dart Image Library
-import 'dart:typed_data'; // Uint8List
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-void main() {
+void main() => runApp(MaterialApp(home: MyHome()));
 
-  WidgetsFlutterBinding.ensureInitialized();
+class MyHome extends StatelessWidget {
+  const MyHome({Key? key}) : super(key: key);
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeRight,//縦固定
-  ]);
-  runApp(MyApp());
-}
-
-// MyApp ウィジェットクラス
-class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      // home: MyHomePage(title: 'Dart Image Library'),
-      home: const RotatedBox(
-        quarterTurns: 1,
-        child: Text('Hello World!'),
-      )
+    return Scaffold(
+      appBar: AppBar(title: Text('Flutter Demo Home Page')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QRViewExample(),
+            ));
+          },
+          child: Text('qrView'),
+        ),
+      ),
     );
   }
 }
 
-// MyHomePage ウィジェットクラス
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+class QRViewExample extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<StatefulWidget> createState() => _QRViewExampleState();
 }
 
-// MyHomePage ステートクラス
-class _MyHomePageState extends State<MyHomePage> {
-  imgLib.Image _image;
-  List<int> _imageBytes;
+class _QRViewExampleState extends State<QRViewExample> {
+  Barcode? result;
+  QRViewController? controller;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
-  // アセットから画像を読み込む関数
-  void loadAssetImage() async {
-    ByteData imageData = await rootBundle.load('images/test.png');
-    _image = imgLib.decodeImage(Uint8List.view(imageData.buffer));
-
-    // imgLib.copyRotate(_image, 90);
-    // _imageBytes = imgLib.encodeJpg(_image);
-    var image = imgLib.copyRotate(_image,90);
-    _imageBytes = imgLib.encodeJpg(image);
-    // setState((){});
-  }
-
-  // 初期化
+  // In order to get hot reload to work we need to pause the camera if the platform
+  // is android, or resume the camera if the platform is iOS.
   @override
-  void initState() {
-    // 初期ダミー画像作成
-    _image = imgLib.Image(250, 250);
-    _imageBytes = imgLib.encodeJpg(_image);
-
-    // アセットから画像を読み込む
-    loadAssetImage();
-
-    super.initState();
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('オリジナル画像'),
-            SizedBox(width: 250, height:  100, child: Image.asset('images/test.png')),
-
-            SizedBox(height: 30),
-
-            Text('フィルター画像'),
-            SizedBox(width: 250, height: 250, child: Image.memory(_imageBytes)),
-
-            RaisedButton(
-              child: Text('フィルター'),
-              onPressed: () {
-                // var image = _image.clone();
-                // // 画像のクローンを作成
-                // imgLib.Image cloneImage = image.clone();
-
-// リサイズされたコピーを作成
-//                 var image = imgLib.copyResize(_image, width: 200);
-                var image = imgLib.copyRotate(_image,180);
-                // ----- フィルター処理テスト
-                // imgLib.vignette(image);
-                // imgLib.gaussianBlur(image, 5);
-                // imgLib.grayscale(image);
-                // imgLib.copyRotate(image, 120);
-                // imgLib.copyResize(image,width: 120);
-                // -----
-                _imageBytes = imgLib.encodeJpg(image);
-                setState((){});
-              },
+      body: Column(
+        children: <Widget>[
+          Expanded(flex: 4, child: _buildQrView(context)),
+          Expanded(
+            flex: 1,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  if (result != null)
+                    Text(
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                  else
+                    Text('Scan a code'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8),
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              await controller?.toggleFlash();
+                              setState(() {});
+                            },
+                            child: FutureBuilder(
+                              future: controller?.getFlashStatus(),
+                              builder: (context, snapshot) {
+                                return Text('Flash: ${snapshot.data}');
+                              },
+                            )),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(8),
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              await controller?.flipCamera();
+                              setState(() {});
+                            },
+                            child: FutureBuilder(
+                              future: controller?.getCameraInfo(),
+                              builder: (context, snapshot) {
+                                if (snapshot.data != null) {
+                                  return Text(
+                                      'Camera facing ${describeEnum(snapshot.data!)}');
+                                } else {
+                                  return Text('loading');
+                                }
+                              },
+                            )),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await controller?.pauseCamera();
+                          },
+                          child: Text('pause', style: TextStyle(fontSize: 20)),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await controller?.resumeCamera();
+                          },
+                          child: Text('resume', style: TextStyle(fontSize: 20)),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          )
+        ],
       ),
     );
+  }
+
+  Widget _buildQrView(BuildContext context) {
+    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
+    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+        MediaQuery.of(context).size.height < 400)
+        ? 150.0
+        : 300.0;
+    // To ensure the Scanner view is properly sizes after rotation
+    // we need to listen for Flutter SizeChanged notification and update controller
+    return QRView(
+      key: qrKey,
+      onQRViewCreated: _onQRViewCreated,
+      overlay: QrScannerOverlayShape(
+          borderColor: Colors.red,
+          borderRadius: 10,
+          borderLength: 30,
+          borderWidth: 10,
+          cutOutSize: scanArea),
+      onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
+    );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    setState(() {
+      this.controller = controller;
+    });
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        result = scanData;
+      });
+    });
+  }
+
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
+    if (!p) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('no Permission')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 }
